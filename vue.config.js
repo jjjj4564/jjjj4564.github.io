@@ -5,7 +5,7 @@ module.exports = {
   // 基本路徑
   publicPath: '/',
   // 輸出檔案目錄
-  outputDir: 'public',
+  outputDir: './dist',
   assetsDir: 'assets', // 靜態資源目錄 (js, css, img, fonts)
   // eslint-loader 是否在儲存的時候檢查
   lintOnSave: true,
