@@ -1,0 +1,77 @@
+// googleSheet.js
+
+const { GoogleSpreadsheet } = require('google-spreadsheet');
+
+const docID = '1eVRUIcs66Gv7JGsluCjDcyUzdb8ID_bSdzeO3Yoi_7I';
+const sheetID = 0;
+
+const getDocSheet = async () => {
+  const doc = new GoogleSpreadsheet(docID);
+  await doc.useServiceAccountAuth({
+      "type": "service_account",
+      "project_id": "covid-casino-315000",
+      "private_key_id": "c1b8f5d62ab2215c50aef5f71329ac7dad195f37",
+      "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCiThsRULVdz6BA\n7asGKGQ7xn2jWyMIxmAW5l3NMr4B+0EXZNORJqCaOagiZiPDtCPrzTBTF6ZjYXM7\ndeu58ZEDNhkDk2fWtfKDXKqGdnrwTsk5Y5EyofQlkqP1Cp/cD7+YklUpmzyufIbo\nqr10l9qkq9zanSm9JT0I1mfzELanAXl2ZEyV4Z7uFoM7xOEH/7vs0lb+CnhIF6tM\ns0DdTSY36pk4H82dQOIcdN15tSbGWycUQnYkqXiPLs5W/UiXAHhJNaj86IU3kFgo\n95GqlpHwBn6VuotbTBwyCUZw53ldiVA/xUS9LyDlPiyneBBsSJEFDXAqRKVHYnQM\n7OVausMFAgMBAAECggEAIkZ8UNvKcVU3cn6+bz54bGcugSDt9RxvjmZ3yK2+koyM\n4nPYef6+S9OBPkJzqxCPxWw/mEyWRsZ9n0D31vy8swDpp2epth4WaMdY+6xpqfX5\naLUuJJMvDAA7v7POrppky8ObWH4AApkppFjqSYUIF15z9XbbKaaDjSo6KYqOCBZg\n+H0EMISWCQ3EE78K9jwemTeeI3/d9wm1aTA4ctjuStRmupmEgmqaM8n15R7uNDFP\nRCGEV4YEG0X2DwAtRKxc6RVbs8GXdQC2npqH6J7sHypMvHl4e2dPohAddc955sFl\nZkDZ0m8MAZMNXGEVk7rsaJU0j/bKhGEIEnmugkjGwQKBgQDkeqxlIpvaQDymEMy1\nTObc93qQQ3KMQBQIRK3QPkxuad9ZqyqZk8HmPN7HJ+SoZPWkmQU8W+wQkCCuWJob\nwXOHPtC+U/L3hqGmju/M2QjpF/PT33XorzWliVNDaGrCLYwFCKvAlNWaxObprM8o\nkinwUgh3/mMy24s2kYCaCYGEJwKBgQC12uedNiTL013pkedTSoD1DmJLaA8qDcqV\nXSbaOEgFkjYh+UW4G5DNu/6s+h9zqxkW8xYAyzY8d5461W4xxpMglqJi8dBaEr3x\nPo8x95rjxjJo4oveXV4tFs95AlQs3J4RXN27cLG/O+HJpgu30YcYyqp12yvVW/EN\nxMmAXhxe8wKBgQDYND1udpGEtcSuYLdV2K+d6ZHRcgGzNe++4z6XEFzDHux7rb1i\nFrAlbvRhAR8fOmo4l5ScyV9ZTQmf8bfjC+yGzqo5cLc6A+xz8E57SeVkrYXNuGeb\nCDF7s7dW0jg0B2W4XbwpQK3hBvJ7rUta2PVWtEnPQqocNiRGPumy2cv1gQKBgG4F\nzI8+zLBMZssDLPMlZjPcyfdZM6N7yI7pVrI7zscgGIQhbd7fPpJaJNC+Wvz+DSXn\nV+6PA3c934s0yYBv5V+YAxLdvfJg2G32LWhLp3ga1zDBr2GPF4UsAcXydL7XkwJq\nLvRSUBekwQvg28IQkC2dn9fCDBj/kS2FW2vAhGWlAoGBAKKyJCo6mpZioHFfqkX2\ns8WGroyz5ospaLZ8DBH0MzFwKN4iaHykCfSJQiY6RxRxlR6OpY0DINqAE96qAAGj\nSA6gJFVD8eVfjHUt63wcNnby0iiX1E3MUgfQ4FYCDQOOJ9NOHQon0Czl04SFeh98\nEm5QXqRSbFRWtJEezZ75uejK\n-----END PRIVATE KEY-----\n",
+      "client_email": "covid-casino@covid-casino-315000.iam.gserviceaccount.com",
+      "client_id": "111414653879849684706",
+      "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+      "token_uri": "https://oauth2.googleapis.com/token",
+      "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+      "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/covid-casino%40covid-casino-315000.iam.gserviceaccount.com"
+    }
+  );
+  await doc.loadInfo();
+
+  const sheet = doc.sheetsById[sheetID];
+
+  return [doc, sheet]
+}
+
+export async function getSheet() {
+  const [doc, sheet] = await getDocSheet();
+
+  const rows = await sheet.getRows();
+
+  return rows;
+};
+
+export async function addSheet() {
+  const [doc] = await getDocSheet();
+  const sheet = await doc.addSheet({ headerValues: ['name', 'email'] });
+
+// append rows
+  const larryRow = await sheet.addRow({ name: 'Larry Page', email: 'larry@google.com' });
+  const moreRows = await sheet.addRows([
+    { name: 'Sergey Brin', email: 'sergey@google.com' },
+    { name: 'Eric Schmidt', email: 'eric@google.com' },
+  ]);
+
+// read rows
+  const rows = await sheet.getRows(); // can pass in { limit, offset }
+
+// read/write row values
+  console.log(rows[0].name); // 'Larry Page'
+  rows[1].email = 'sergey@abc.xyz'; // update a value
+  await rows[1].save(); // save updates
+  await rows[1].delete(); // delete a row
+}
+
+export async function editSheet({value, cellName}) {
+  const [doc, sheet] = await getDocSheet();
+
+  await sheet.loadCells('A1:C7'); // loads a range of cells
+  console.log(sheet.cellStats); // total cells, loaded, how many non-empty
+  // const a1 = sheet.getCell(0, 0); // access cells using a zero-based index
+  // const c6 = sheet.getCellByA1('C6'); // or A1 style notation
+// access everything about the cell
+  const cell = sheet.getCellByA1(cellName);
+
+// update the cell contents and formatting
+  cell.value = value;
+  // c6.formula = '=A1';
+  // a1.textFormat = { bold: true };
+  // c6.note = 'This is a note!';
+  await sheet.saveUpdatedCells(); // save all updates in one call
+
+  return true
+}

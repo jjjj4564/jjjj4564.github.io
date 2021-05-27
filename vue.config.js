@@ -74,6 +74,7 @@ module.exports = {
     proxy: null, // 設定代理
     before: app => {}
   },
+  indexPath: 'index.html',
   // 第三方外掛配置
   pluginOptions: {
     // ...

@@ -1,0 +1,48 @@
+
+
+// ===
+// Style
+// ===
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background: #fff;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  width: 100%;
+  overflow-x: hidden;
+  letter-spacing: 0.1em;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  font-size: 1.125em;
+}
+
+input,
+select {
+  &:-webkit-autofill {
+    transition: background-color 5000s ease-in-out 0s;
+  }
+}
+
+svg,
+img {
+  max-width: 100%;
+}
+
+hr {
+  margin: 2rem 0;
+}
+
+::selection {
+	// background: $color-primary;
+	color: #fff;
+}

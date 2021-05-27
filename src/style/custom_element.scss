@@ -1,0 +1,13 @@
+// ===
+// Dropdown
+// ===
+.el-input {
+  &.isStyleBase {
+    .el-input__inner {
+      border-radius: 0;
+      line-height: 60px;
+      height: 60px;
+      font-size: 2rem;
+    }
+  }
+}

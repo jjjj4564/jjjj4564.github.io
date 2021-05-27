@@ -1,14 +1,18 @@
 <template>
   <div id="app">
-    <div id="nav">
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.13.1/css/all.css" integrity="sha384-B9BoFFAuBaCfqw6lxWBZrhg/z4NkwqdBci+E+Sc2XlK/Rz25RYn8Fetb+Aw5irxa" crossorigin="anonymous">
+    <!--<div id="nav">
       <router-link to="/">Home..</router-link> |
       <router-link to="/about">About</router-link>
-    </div>
+    </div>-->
     <router-view/>
   </div>
 </template>
 
 <style lang="scss">
+@import '~bootstrap/scss/bootstrap';
+@import "style/index";
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
