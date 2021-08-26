@@ -2,6 +2,23 @@
 // @ is an alias to /src
 import HelloWorld from '@/components/HelloWorld.vue'
 import { getSheet, editSheet } from '../plugin/google-sheet.js'
+import { setCookie, getCookie } from '../utils/cookie.js'
+import formatDate from "../utils/format-date";
+import _findIndex from 'lodash/findIndex'
+import _orderBy from 'lodash/orderBy'
+import _groupBy from 'lodash/groupBy'
+
+/* temp2 = temp1.map(item => {
+ const temp =  {...item};
+
+ delete temp._rawData;
+ delete temp._rowNumber;
+ delete temp._sheet;
+ delete temp['名字'];
+ delete temp['頭像'];
+
+ return temp
+ }) */
 
 export default {
   name: 'Home',
@@ -10,35 +27,469 @@ export default {
   },
   data() {
     return {
-      input1: 'aa',
-      submitData: {
-        data1: '',
-        data2: '',
-        data3: '',
-        data4: '',
-        data5: '',
-        data6: '',
-        data7: ''
-      },
-      headerList: [],
-      data: '',
-      loadingEditData: false
+      loadingNewUser: false,
+      loadingGetData: false,
+      loadingEditData: false,
+      loadingInit: false,
+      loadingCheckDate: false,
+      loadingSetNewNumber: false,
+      userName: '',
+      newUserName: '',
+      newNumber: '',
+      dayDiffRankMap: {},
+      /*oldSheet: [
+        {
+          "20210522": "323",
+          "20210525": "281",
+          "20210527": "671",
+          "20210528": "557",
+          "20210529": "493",
+          "20210530": "355",
+          "20210531": "278",
+          "20210601": "267",
+          "20210602": "372",
+          "20210603": "366",
+          "20210604": "341",
+          "20210605": "476",
+          "20210606": "335",
+          "20210607": "214",
+          "20210608": "219",
+          "20210609": "275",
+          "20210610": "266",
+          "20210611": "287",
+          "20210612": "251",
+          "20210613": "175",
+          "20210614": "185",
+          "20210615": "135",
+          "20210616": "170",
+          "20210617": "175",
+          "20210618": "188",
+          "20210619": "128",
+          "20210620": "107",
+        },
+        {
+          "20210522": "300",
+          "20210525": "280",
+          "20210527": "450",
+          "20210528": "575",
+          "20210529": "565",
+          "20210530": "500",
+          "20210531": "500",
+          "20210601": "280",
+          "20210602": "260",
+          "20210603": "260",
+          "20210604": "360",
+          "20210605": "320",
+          "20210606": "408",
+          "20210607": "360",
+          "20210608": "214",
+          "20210609": "219",
+          "20210610": "275",
+          "20210611": "266",
+          "20210612": "287",
+          "20210613": "230",
+          "20210614": "200",
+          "20210615": "180",
+          "20210616": "135",
+          "20210617": "170",
+          "20210618": "160",
+          "20210619": "180",
+          "20210620": "128",
+        },
+        {
+          "20210522": "999",
+          "20210525": "372",
+          "20210527": "666",
+          "20210528": "658",
+          "20210529": "560",
+          "20210530": "476",
+          "20210531": "286",
+          "20210601": "261",
+          "20210602": "247",
+          "20210603": "307",
+          "20210604": "341",
+          "20210605": "367",
+          "20210606": "487",
+          "20210607": "289",
+          "20210608": "295",
+          "20210609": "235",
+          "20210610": "256",
+          "20210611": "258",
+          "20210612": "189",
+          "20210613": "262",
+          "20210614": "189",
+          "20210615": "203",
+          "20210616": "158",
+          "20210617": "178",
+          "20210618": "187",
+          "20210619": "152",
+          "20210620": "147",
+        },
+        {
+          "20210522": "260",
+          "20210525": "324",
+          "20210527": "578",
+          "20210528": "577",
+          "20210529": "598",
+          "20210530": "547",
+          "20210531": "305",
+          "20210601": "275",
+          "20210602": "283",
+          "20210603": "305",
+          "20210604": "328",
+          "20210605": "352",
+          "20210606": "368",
+          "20210607": "386",
+          "20210608": "358",
+          "20210609": "263",
+          "20210610": "302",
+          "20210611": "275",
+          "20210612": "238",
+          "20210613": "238",
+          "20210614": "218",
+          "20210615": "187",
+          "20210616": "128",
+          "20210617": "156",
+          "20210618": "166",
+          "20210619": "177",
+          "20210620": "166",
+        },
+        {
+          "20210522": "350",
+          "20210525": "350",
+          "20210527": "568",
+          "20210528": "598",
+          "20210529": "592",
+          "20210530": "566",
+          "20210531": "300",
+          "20210601": "248",
+          "20210602": "220",
+          "20210603": "999",
+          "20210604": "350",
+          "20210605": "350",
+          "20210606": "388",
+          "20210607": "368",
+          "20210608": "268",
+          "20210609": "236",
+          "20210610": "276",
+          "20210611": "251",
+          "20210612": "269",
+          "20210613": "257",
+          "20210614": "212",
+          "20210615": "179",
+          "20210616": "159",
+          "20210617": "141",
+          "20210618": "161",
+          "20210619": "169",
+          "20210620": "155",
+        },
+        {
+          "20210522": "300",
+          "20210525": "310",
+          "20210527": "534",
+          "20210528": "571",
+          "20210529": "588",
+          "20210530": "577",
+          "20210531": "356",
+          "20210601": "335",
+          "20210602": "236",
+          "20210603": "345",
+          "20210604": "366",
+          "20210605": "323",
+          "20210606": "366",
+          "20210607": "357",
+          "20210608": "321",
+          "20210609": "330",
+          "20210610": "303",
+          "20210611": "266",
+          "20210612": "273",
+          "20210613": "266",
+          "20210614": "203",
+          "20210615": "177",
+          "20210616": "154",
+          "20210617": "165",
+          "20210618": "154",
+          "20210619": "167",
+          "20210620": "134",
+        },
+        {
+          "20210522": "280",
+          "20210525": "270",
+          "20210527": "590",
+          "20210528": "592",
+          "20210529": "576",
+          "20210530": "520",
+          "20210531": "258",
+          "20210601": "278",
+          "20210602": "256",
+          "20210603": "282",
+          "20210604": "342",
+          "20210605": "352",
+          "20210606": "452",
+          "20210607": "355",
+          "20210608": "346",
+          "20210609": "205",
+          "20210610": "250",
+          "20210611": "258",
+          "20210612": "270",
+          "20210613": "242",
+          "20210614": "222",
+          "20210615": "172",
+          "20210616": "118",
+          "20210617": "156",
+          "20210618": "144",
+          "20210619": "162",
+          "20210620": "138",
+        }
+      ],*/
+      oldSheet: [],
+      originalSheet: [],
+      sheet: [],
+      today: formatDate(new Date()),
     }
   },
+  computed: {
+    userData() {
+      const sheetItem = this.sheet.filter(item => {
+        return item['名字'] === this.userName;
+      });
+
+      return sheetItem.length > 0
+        ? sheetItem[0]
+        : false
+    },
+    unUse() {
+      const today = formatDate(new Date());
+
+      const sheetItem = this.sheet.filter(item => {
+        return !item[today];
+      });
+
+      return sheetItem;
+    },
+  },
   mounted() {
-    this.getData();
+    this.userName = getCookie('userName');
+    if(this.userName) {
+      setCookie('userName', this.userName)
+    }
+
+    this.loadingInit = true;
+    this.getData()
+      .then(() => {
+        this.loadingInit = false;
+        this.checkDate();
+      })
+
+    // setCookie('userName', '')
 
   },
   methods: {
-    async getData() {
-      const sheet = await getSheet();
+    ...formatDate,
+    async checkDate() {
+      this.loadingCheckDate = true;
+      const today = formatDate(new Date());
 
-      this.data = sheet.map((item, index) => {
-        this.submitData[`data${index + 1}`] = item._rawData[1];
-        this.headerList[index] = item._rawData[0];
-        this.$forceUpdate();
-        return item._rawData
+      if(this.sheet[0][today] === undefined) {
+        editSheet({
+          value: today,
+          cellIndex: [0, Object.keys(this.sheet[0]).length - 5 ]
+        })
+          .then(() => {
+            editSheet({
+              value: 0,
+              cellIndex: [1, Object.keys(this.sheet[0]).length - 5 ]
+            })
+              .then(() => {
+                this.getData();
+              })
+              .finally(() => {
+                this.loadingCheckDate = false
+              })
+          })
+      }else {
+        this.loadingCheckDate = false
+      }
+    },
+    async getData() {
+      this.loadingGetData = true;
+
+      const mergeSheet = (originalSheet) => {
+        const sheet = [...originalSheet];
+
+        originalSheet.forEach((item, index) => {
+          const dItem = {...item};
+          sheet[index] = Object.assign(dItem, this.oldSheet[index]);
+          // console.log(Object.assign(dItem, this.oldSheet[index]))
+        });
+
+        return sheet
+      };
+
+      const originalSheet = await getSheet().finally(()=>{ this.loadingGetData = false });
+
+      const sheet = mergeSheet(originalSheet);
+
+      const diffMap = () => {
+        const diffMap = [];
+
+        sheet.forEach((item, index) => {
+
+          const map = () => {
+            const map = {};
+
+            Object.keys(item).forEach(key => {
+              const isDay = key !== '名字' && key !== '頭像' && key.indexOf('_') === -1;
+              const isNumber = Number(item[key]);
+
+              if(isDay && isNumber) {
+                map[key] = Math.abs(item[key] - sheet[0][key]) || 0
+              }
+            });
+
+            return map;
+          };
+
+          diffMap.push({
+            '名字': item['名字'],
+            ...map()
+          })
+        });
+
+        return diffMap
+      };
+
+      const dayDiffRankMap = () => {
+        const dayDiffRankMap = {};
+
+        Object.keys(sheet[0]).forEach(key => {
+          const isDay = key !== '名字' && key !== '頭像' && key.indexOf('_') === -1;
+
+          if(isDay) {
+            dayDiffRankMap[key] = _orderBy(diffMap(), [key], ['desc']);
+          }
+        })
+
+        return dayDiffRankMap
+      };
+
+      this.dayDiffRankMap = dayDiffRankMap();
+
+      originalSheet.forEach((item, index) => {
+        const keys = Object.keys(item);
+        let tempItem = {};
+
+        keys.forEach(key => {
+          this.$set(this.originalSheet, index, {});
+
+          if(key.indexOf('_') === -1) {
+            tempItem[key] = item[key] || '';
+          }
+        });
+
+        this.$set(this.originalSheet, index, tempItem);
       });
+      sheet.forEach((item, index) => {
+        const keys = Object.keys(item);
+        let tempItem = {};
+
+        keys.forEach(key => {
+          this.$set(this.sheet, index, {});
+
+          if(key.indexOf('_') === -1) {
+            tempItem[key] = item[key] || '';
+          }
+        });
+
+        const dataCount = () => {
+          let medals = 0;
+          let dead = 0;
+          let medalsStatus = '';
+          let deadStatus = '';
+          // let isFine = false;
+          // let isWin = false;
+          // let isLose = false;
+
+          Object.keys(item).forEach(key => {
+            const isDay = key !== '名字' && key !== '頭像' && key.indexOf('_') === -1;
+            const isNumber = Number(item[key]);
+
+            if(isDay && isNumber) {
+              const isRange = Number(item[key]) >= Number(sheet[0][key]) - 5 && Number(item[key]) <= Number(sheet[0][key]) + 5;
+              const isLose = dayDiffRankMap()[key][0]['名字'] === item['名字'] || dayDiffRankMap()[key][1]['名字'] === item['名字'];
+
+              const isTodayNotZero = Number(sheet[0][this.today]) !== 0 || key !== this.today;
+              const isToday = key === this.today;
+
+              if(isRange) {
+                medals += 1;
+                if(isToday) {
+                  medalsStatus = 'get'
+                }
+              }
+
+              if(isLose && !isRange) {
+                if(medals === 0) {
+                  dead += 1;
+                  if(isToday) {
+                    deadStatus = 'get'
+                  }
+                }
+
+                if(isTodayNotZero && medals > 0) {
+                  medals -= 1;
+                  if(isToday) {
+                    medalsStatus = 'lose'
+                  }
+                }
+              }
+            };
+          });
+
+          return {
+            medals, dead, medalsStatus, deadStatus
+            // isFine, isWin, isLose
+          }
+        };
+
+        tempItem['diff'] = Math.abs(item[this.today] - this.sheet[0][this.today]) || 0;
+        tempItem['medals'] = dataCount().medals;
+        tempItem['dead'] = dataCount().dead;
+        tempItem['medalsStatus'] = dataCount().medalsStatus;
+        tempItem['deadStatus'] = dataCount().deadStatus;
+
+        this.$set(this.sheet, index, tempItem);
+      });
+
+      return true;
+    },
+    async newUser() {
+      this.loadingNewUser = true;
+
+      const sheet = await getSheet();
+      const isOldUser = this.sheet.map(item => {
+        return item['名字']
+      }).includes(this.newUserName);
+
+      if(isOldUser) {
+        setCookie('userName', this.newUserName);
+        this.userName = this.newUserName;
+      }else {
+        editSheet({
+          value: this.newUserName,
+          cellName: `A${sheet.length + 2}`
+        })
+          .then(async ()=> {
+            await this.getData()
+              .then(() => {
+                setCookie('userName', this.newUserName);
+                this.userName = this.newUserName;
+              })
+          })
+          .finally(() => {
+            this.loadingNewUser = false;
+          })
+      }
     },
     async editData(value, index) {
       if(value && Number(value)) {
@@ -52,8 +503,39 @@ export default {
             this.loadingEditData = false;
           })
       }else {
-        this.submitData[`data${index + 1}`] = '';
+
       }
+    },
+    async setNewNumber() {
+      if(this.newNumber && Number(this.newNumber)) {
+        this.loadingSetNewNumber = true;
+        const today = formatDate(new Date());
+
+        const nameIndex = _findIndex(this.sheet, (item) => {
+          return item['名字'] === this.userName;
+        });
+
+        const dateIndex = _findIndex(Object.keys(this.sheet[0]), (key) => {
+          return key === today;
+        });
+
+        editSheet({
+          value: this.newNumber,
+          cellIndex: [nameIndex + 1,  dateIndex + 2]
+        })
+          .then(() => {
+            this.getData();
+
+            this.$message({
+              message: '輸入成功',
+              type: 'success'
+            });
+          })
+          .finally(() => {
+            this.loadingSetNewNumber = false;
+          })
+      }
+
     }
   }
 }
@@ -61,57 +543,331 @@ export default {
 <template>
   <div :class="$style.home" class="home py-5">
     <div class="container text-left">
-      <div class="row py-3">
-        <div class="col-1">
-          <i class="fad fa-user-tag fa-2x"></i>
+
+      <transition-group name="el-fade-in-linear" mode="in-out">
+        <div key="loading" class="box" v-if="loadingInit || loadingCheckDate || loadingGetData">
+          <div class="cat">
+            <div class="cat__body"></div>
+            <div class="cat__body"></div>
+            <div class="cat__tail"></div>
+            <div class="cat__head"></div>
+          </div>
         </div>
-        <div class="col-11">
-          <i class="fad fa-head-side-cough mr-2 fa-2x"></i>
-          <i class="fad fa-disease mr-1 fa-lg"></i>
-          <i class="fad fa-viruses mr-1 fa-lg"></i>
-          <i class="fad fa-bacteria mr-1 fa-lg"></i>
-        </div>
-      </div>
-      <div
-        v-for="(header, index) in headerList"
-        :key="index"
-        class="row align-items-center py-2"
-      >
-        <div class="col-1">
-          <span style="font-size: 2rem">{{ header }}</span>
-        </div>
-        <div class="col-11">
+        <div key="1" v-else-if="!userData">
+          <!--<el-alert
+          :title="`系統正在改版，麻煩大家今天再輸入一次自己的暱稱`"
+          type="error"
+          :closable="false"
+          class="isStyleBase mb-3"
+        >
+        </el-alert>-->
+          <el-alert
+            :title="`系統目前有${sheet.length}位使用者`"
+            type="info"
+            :closable="false"
+            class="isStyleBase mb-5"
+          >
+          </el-alert>
           <el-input
-            v-model.number="submitData[`data${index + 1}`]"
-            placeholder="請輸入.."
-            class="isStyleBase"
-            autocomplete="tel"
-            inputmode="tel"
-            @blur="editData(submitData[`data${index + 1}`], index)"
+            v-model="newUserName"
+            placeholder="請輸入您的暱稱"
+            class="mb-5"
           >
           </el-input>
+          <el-button
+            :loading="loadingNewUser"
+            :disabled="!newUserName"
+            type="primary"
+            plain
+            class="w-100"
+            @click="newUser"
+          >
+            送出
+          </el-button>
         </div>
-      </div>
-      <div class="home__loading" v-if="loadingEditData">
-        <i class="fad fa-circle-notch fa-spin mr-2"></i>儲存中 ...
-      </div>
-    </div>
-    <pre>
+        <div key="2" v-else-if="unUse.length === 0">
+          <el-alert
+            title="所有使用者皆以輸入，系統公開數字"
+            type="info"
+            :closable="false"
+            class="mb-5"
+          ></el-alert>
+          <el-table
+            :data="sheet"
+            style="width: 100%"
+            :default-sort = "{prop: 'diff', order: 'descending'}"
+          >
+            <el-table-column v-slot="{ row }" label="姓名" width="160">
+              <img alt="" class="mr-3" width="25px" :src="`${row['頭像'] ? require(`@/assets/${row['頭像']}.png`) : require(`@/assets/正確答案.png`)}`">{{ row['名字'] }}
+            </el-table-column>
+            <el-table-column v-slot="{ row }" label="數字" :prop="today" sortable>
+              {{ row[today] || 0 }}
+            </el-table-column>
+            <el-table-column v-slot="{ row }" label="差距" prop="diff" sortable>
+              {{ Math.abs(row[today] - (sheet[0][today] || 0)) }}
+            </el-table-column>
+            <el-table-column v-slot="{ row }" label="🎖" prop="medals" width="90">
+              {{ row['medals'] }}
+              <template v-if="row.medalsStatus === 'get'">
+                (+1)
+              </template>
+              <template v-if="row.medalsStatus === 'lose'">
+                (-1)
+              </template>
+            </el-table-column>
+            <el-table-column v-slot="{ row }" label="💸" prop="dead" width="160">
+              [{{row['dead']}}] {{ row['dead'] * 150 }}
+              <template v-if="row.deadStatus === 'get'">
+                (+150)
+              </template>
+            </el-table-column>
 
-    </pre>
+          </el-table>
+        </div>
+        <div key="3" v-else>
+          <div class="text-center">
+            <div style="margin-bottom: 2rem">
+              <div class="avatar">
+                <div
+                  class="avatar__img"
+                >
+                  <div
+                    class="avatar__imgInner"
+                    :style="userData['頭像'] ? `backgroundImage: url('${require(`@/assets/${userData['頭像']}.png`)}')` : ''"
+                  >
+
+                  </div>
+                </div>
+              </div>
+              <div style="font-size: 2rem;margin-top: 2rem;font-weight: 500">Hi, {{ userData['名字'] }}</div>
+            </div>
+            <template v-if="userData[today]">
+              <div class="text-center">
+                這是你今天輸入的數字
+                <div style="font-size: 170px;font-weight: 900;">{{ userData[today] }}</div>
+              </div>
+              <el-alert
+                :title="`好像還有人沒猜數字喔`"
+                type="error"
+                :closable="false"
+                class="mb-5 isStyleBase"
+              ></el-alert>
+              <template v-for="unUseItem in unUse">
+                <div
+                  v-if="unUseItem['名字'] !== userData['名字']"
+                  class="avatar isSmall"
+                >
+                  <div
+                    class="avatar__img"
+                  >
+                    <div
+                      class="avatar__imgInner"
+                      :style="unUseItem['頭像'] ? `backgroundImage: url('${require(`@/assets/${unUseItem['頭像']}.png`)}')` : ''"
+                    >
+
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </template>
+            <template v-else>
+              <el-input
+                v-model="newNumber"
+                placeholder="請輸入今天的數字"
+                class="isStyleBase mb-5"
+              >
+              </el-input>
+              <el-button
+                :loading="loadingSetNewNumber"
+                :disabled="!newNumber"
+                type="primary"
+                plain
+                class="w-100 mb-5"
+                @click="setNewNumber"
+              >
+                送出
+              </el-button>
+            </template>
+          </div>
+        </div>
+      </transition-group>
+    </div>
   </div>
 </template>
-
 <style lang="scss" module>
-  .home {
-    :global {
-      .home {
-        &__loading {
-          position: fixed;
-          right: 1rem;
-          bottom: 1rem;
+.home {
+  :global {
+    .home {
+      &__loading {
+        position: fixed;
+        right: 1rem;
+        bottom: 1rem;
+      }
+    }
+    .avatar {
+      width: 100px;
+      margin: 0 auto;
+      position: relative;
+      &:before {
+        content: '';
+        position: absolute;
+        left: -5px;
+        right: -5px;
+        top: -5px;
+        bottom: -5px;
+        transition: left 0.3s, right 0.3s, top 0.3s, bottom 0.3s, opacity 0.3s;
+        border: 1px solid;
+        opacity: 0.5;
+        transform: rotate(45deg);
+      }
+      &.isSmall {
+        width: 50px;
+        display: inline-block;
+        margin: 0 10px;
+        .avatar {
+          &__img {
+            width: 50px;
+            padding: 50px 0 0 0;
+          }
+          &__imgInner {
+            background-size: 70px;
+            background-position: center 70px;
+          }
+        }
+      }
+      .avatar {
+        &__img {
+          width: 100px;
+          padding: 100px 0 0 0;
+          transform: rotate(45deg);
+          position: relative;
+          background: transparent;
+          border: 1px solid;
+          overflow: hidden;
+          background-position: center;
+          background-size: cover;
+        }
+        &__imgInner {
+          left: 0;
+          top: 0;
+          width: 140px;
+          height: 140px;
+          margin-top: -20px;
+          margin-left: -20px;
+          transform: rotate(-45deg);
+          position: absolute;
+          background-size: cover;
+          background-position: center;
         }
       }
     }
+
+    @mixin fill-full($dir: 'full', $type: absolute) {
+      position: $type;
+      @if $dir != 'bottom' {top: 0; }
+      @if $dir != 'right' {left: 0; }
+      @if $dir != 'left' {right: 0; }
+      @if $dir != 'top' {bottom: 0; }
+    }
+
+    .cat {
+      position: relative;
+      width: 100%;
+      &::before {
+        content: '';
+        display: block;
+        padding-bottom: 100%;
+      }
+
+      &:hover > * { animation-play-state: paused; }
+      &:active > * { animation-play-state: running; }
+    }
+
+    %cat-img {
+      @include fill-full;
+      animation: rotatinga 8.37s cubic-bezier(.65, .54, .12, .93) infinite;
+
+      &::before {
+        content: '';
+        position: absolute;
+        width: 50%;
+        height: 50%;
+        background-size: 200%;
+        background-repeat: no-repeat;
+        background-image: url('https://images.weserv.nl/?url=i.imgur.com/M1raXX3.png&il');
+      }
+    }
+
+    .cat__head {
+      @extend %cat-img;
+
+      &::before {
+        top: 0;
+        right: 0;
+        background-position: 100% 0%;
+        transform-origin: 0% 100%;
+        transform: rotate(90deg);
+      }
+    }
+
+    .cat__tail {
+      @extend %cat-img;
+      // animation-delay: .2s;
+
+      &::before {
+        left: 0;
+        bottom: 0;
+        background-position: 0% 100%;
+        transform-origin: 100% 0%;
+        transform: rotate(-30deg);
+      }
+    }
+
+    .cat__body {
+      @extend %cat-img;
+      // animation-delay: .1s;
+
+
+      &:nth-of-type(2) {
+        // animation-delay: .2s;
+      }
+
+      &::before {
+        right: 0;
+        bottom: 0;
+        background-position: 100% 100%;
+        transform-origin: 0% 0%;
+      }
+    }
+
+    .box {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      justify-content: flex-start;
+      justify-content: center;
+      align-items: center;
+      margin: 25vh auto;
+      width: 200px;
+      height: 200px;
+      position: relative;
+      background-color: #e6dcdc;
+      overflow: hidden;
+      overflow: hidden;
+      border-radius: 100%;
+      padding: 30px;
+    }
   }
+}
+
+</style>
+<style lang="scss">
+@keyframes rotatinga {
+  from {
+    transform: rotate(2160deg);
+  }
+  to {
+    transform: none;
+  }
+}
 </style>

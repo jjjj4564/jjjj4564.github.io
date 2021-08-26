@@ -1,5 +1,7 @@
 const path = require('path');
 const debug = process.env.NODE_ENV !== 'production';
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+
 
 module.exports = {
   // 基本路徑
@@ -23,6 +25,8 @@ module.exports = {
     }
   },
   configureWebpack: (config) => {// webpack配置，值位物件時會合並配置，為方法時會改寫配置
+    config.name = 'test';
+
     if (debug) { // 開發環境配置
       config.devtool = 'cheap-module-eval-source-map'
     } else { // 生產環境配置

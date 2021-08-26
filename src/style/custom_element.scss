@@ -11,3 +11,15 @@
     }
   }
 }
+
+// ===
+// Alert
+// ===
+.el-alert {
+  &.isStyleBase {
+    .el-alert__content {
+      width: 100%;
+    }
+  }
+}
+

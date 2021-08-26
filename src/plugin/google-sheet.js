@@ -56,18 +56,25 @@ export async function addSheet() {
   await rows[1].delete(); // delete a row
 }
 
-export async function editSheet({value, cellName}) {
+export async function editSheet({value, cellName, cellIndex}) {
   const [doc, sheet] = await getDocSheet();
 
-  await sheet.loadCells('A1:C7'); // loads a range of cells
+  await sheet.loadCells('A1:AE20'); // loads a range of cells
   console.log(sheet.cellStats); // total cells, loaded, how many non-empty
   // const a1 = sheet.getCell(0, 0); // access cells using a zero-based index
   // const c6 = sheet.getCellByA1('C6'); // or A1 style notation
 // access everything about the cell
-  const cell = sheet.getCellByA1(cellName);
+
+  const cell = () => {
+    if(cellName) {
+      return sheet.getCellByA1(cellName);
+    }else if(cellIndex) {
+      return sheet.getCell(...cellIndex);
+    }
+  }
 
 // update the cell contents and formatting
-  cell.value = value;
+  cell().value = value;
   // c6.formula = '=A1';
   // a1.textFormat = { bold: true };
   // c6.note = 'This is a note!';
